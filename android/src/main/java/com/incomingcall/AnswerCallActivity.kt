@@ -97,13 +97,6 @@ class AnswerCallActivity : ReactActivity() {
     super.onUserLeaveHint()
   }
 
-  override fun onWindowFocusChanged(hasFocus: Boolean) {
-    if(!hasFocus){
-      enterPipMode(380, 214)
-    }
-    super.onWindowFocusChanged(hasFocus)
-  }
-
   override fun onPictureInPictureModeChanged(
     isInPictureInPictureMode: Boolean,
     newConfig: Configuration?
