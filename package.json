@@ -12,7 +12,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "react-native": "0.70.6",
+    "react-native": "^0.67.5",
     "react-native-voip-call": "^1.1.1"
   },
   "peerDependencies": {
