@@ -1,11 +1,12 @@
 import { NativeModules, DeviceEventEmitter, Platform } from 'react-native';
 import { listeners } from './listener';
+import RNVoipCall, { RNVoipPushKit } from 'react-native-voip-call';
 
 const IsIOS = Platform.OS === 'ios';
 
 const incomingCallEventHandlers = new Map();
-const IncomingCall = NativeModules.IncomingCall;
-const IncomingCallPushKit = NativeModules.IncomingCallPushKit;
+const IncomingCall = IsIOS ? RNVoipCall : NativeModules.IncomingCall;
+const IncomingCallPushKit = IsIOS ? RNVoipPushKit : NativeModules.IncomingCallPushKit;
 
 const addEventListener = (type: string, handler: any) => {
   const listener = listeners[type](handler);
@@ -171,4 +172,6 @@ export {
   removeListener,
   requestPermissions,
   stickyImmersive,
+  IncomingCall,
+  IncomingCallPushKit
 };
