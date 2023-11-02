@@ -2,19 +2,64 @@ package com.incomingcall
 
 import android.content.Intent
 import android.os.Build
-import android.view.View
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.annotation.RequiresApi
-import com.facebook.react.bridge.*
-import com.facebook.react.bridge.UiThreadUtil.runOnUiThread
-import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import com.facebook.react.uimanager.IllegalViewOperationException
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.WritableMap
+import com.facebook.react.modules.core.DeviceEventManagerModule
 
+data class CallData(
+  val channelName: String? = Constants.INCOMING_CALL,
+  val channelId: String? = Constants.INCOMING_CALL,
+  val timeout: Long?,
+  val component: String?,
+  val callerName: String? = "Visitor",
+  val accessToken: String?
+) : Parcelable {
+
+  constructor(parcel: Parcel) : this(
+    parcel.readString(),
+    parcel.readString(),
+    parcel.readLong(),
+    parcel.readString(),
+    parcel.readString(),
+    parcel.readString()
+  )
+
+  override fun describeContents(): Int {
+    return 0
+  }
+
+  override fun writeToParcel(parcel: Parcel, p: Int) {
+    parcel.writeString(channelName)
+    parcel.writeString(channelId)
+    parcel.writeLong(timeout ?: Constants.TIME_OUT)
+    parcel.writeString(component)
+    parcel.writeString(callerName)
+    parcel.writeString(accessToken)
+  }
+
+  companion object CREATOR : Parcelable.Creator<CallData> {
+    override fun createFromParcel(parcel: Parcel): CallData {
+      return CallData(parcel)
+    }
+
+    override fun newArray(size: Int): Array<CallData?> {
+      return arrayOfNulls(size)
+    }
+  }
+
+}
 
 class IncomingCallModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
   override fun getName(): String {
-    return Constants.INCOMING_CALL
+    return NAME
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
@@ -26,75 +71,43 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
         CallService::class.java
       )
     )
+    val channelName = options?.getString("channelName")
+    val channelId = options?.getString("channelId")
+    val timeout = options?.getDouble("timeout")?.toLong()
+    val component = options?.getString("component")
+    val callerName = options?.getString("callerName")
+    val accessToken = options?.getString("accessToken")
+    val callData = CallData(channelName, channelId, timeout, component, callerName, accessToken)
+
     val intent = Intent(reactApplicationContext, CallService::class.java)
-    intent.putExtra("channelName", options?.getString("channelName"))
-    intent.putExtra("channelId", options?.getString("channelId"))
-    intent.putExtra("timeout", options?.getDouble("timeout")?.toLong())
-    intent.putExtra("component", options?.getString("component"))
-    intent.putExtra("callerName", options?.getString("callerName"))
-    intent.putExtra("accessToken", options?.getString("accessToken"))
+    intent.putExtra("callData", callData)
     reactApplicationContext.startForegroundService(intent)
   }
 
   @ReactMethod
   fun endCall() {
-      reactApplicationContext.stopService(
-          Intent(
-              reactApplicationContext,
-              CallService::class.java
-          )
+    reactApplicationContext.stopService(
+      Intent(
+        reactApplicationContext,
+        CallService::class.java
       )
+    )
 
-    if(CallingActivity.active){
+    if (CallingActivity.active) {
       reactApplicationContext.sendBroadcast(Intent(Constants.ACTION_END_INCOMING_CALL))
     }
-    if(AnswerCallActivity.active){
+    if (AnswerCallActivity.active) {
       reactApplicationContext.sendBroadcast(Intent(Constants.ACTION_END_ACTIVE_CALL))
     }
   }
 
   @ReactMethod
   fun sendEventToJs(eventName: String, params: WritableMap?) {
-    reactApplicationContext?.getJSModule(RCTDeviceEventEmitter::class.java)
+    reactApplicationContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
       ?.emit(eventName, params)
   }
 
-  private fun setSystemUIFlags(visibility: Int, promise: Promise) {
-    try {
-      runOnUiThread {
-        val requiredVersion = Build.VERSION_CODES.LOLLIPOP
-        if (Build.VERSION.SDK_INT < requiredVersion) {
-          promise.reject("Error: ", errorMessage(requiredVersion))
-          return@runOnUiThread
-        }
-        val currentActivity = currentActivity
-        if (currentActivity == null) {
-          promise.reject("Error: ", "current activity is null")
-          return@runOnUiThread
-        }
-        val decorView = currentActivity.window.decorView
-        decorView.systemUiVisibility = visibility
-      }
-      promise.resolve("true")
-    } catch (e: IllegalViewOperationException) {
-      e.printStackTrace()
-      promise.reject("Error: ", e.message)
-    }
+  companion object {
+    const val NAME = "IncomingCall"
   }
-
-  private fun errorMessage(version: Int): String? {
-    return "Your device version: " + Build.VERSION.SDK_INT + ". Supported API Level: " + version
-  }
-
-  /* Sticky Immersive */
-  @ReactMethod
-  fun stickyImmersive(promise: Promise?) {
-    setSystemUIFlags(
-      (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-        View.SYSTEM_UI_FLAG_FULLSCREEN or
-        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION),
-      (promise)!!
-    )
-  }
-  
 }
