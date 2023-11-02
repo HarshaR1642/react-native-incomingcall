@@ -16,25 +16,15 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.os.VibratorManager
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 
 class CallService : Service() {
-  private var ringtone: Ringtone? = null
-
   override fun onBind(intent: Intent?): IBinder? {
     return null
   }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    removeNotification()
-    stopRingtone()
-    stopVibration()
-    cancelTimer()
-  }
-
 
   @RequiresApi(Build.VERSION_CODES.O)
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -122,7 +112,7 @@ class CallService : Service() {
       run {
         stopSelf()
         if (CallingActivity.active) {
-          sendBroadcast(Intent(Constants.ACTION_END_INCOMING_CALL))
+          sendBroadcast(Intent(Constants.ACTION_END_CALL))
         }
       }
     }
@@ -146,11 +136,19 @@ class CallService : Service() {
     ringtone?.stop()
   }
 
+  @Suppress("DEPRECATION")
   @RequiresApi(Build.VERSION_CODES.O)
   private fun startVibration() {
     val vibratePattern = longArrayOf(0, 1000, 1000)
 
-    vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val vibratorManager =
+        getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+      vibratorManager.defaultVibrator
+    } else {
+      getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+
     stopVibration()
     vibrator?.vibrate(VibrationEffect.createWaveform(vibratePattern, 0))
   }
@@ -159,9 +157,18 @@ class CallService : Service() {
     vibrator?.cancel()
   }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    removeNotification()
+    stopRingtone()
+    stopVibration()
+    cancelTimer()
+  }
+
   companion object {
     var handler: Handler? = null
     var runnable: Runnable? = null
     var vibrator: Vibrator? = null
+    var ringtone: Ringtone? = null
   }
 }

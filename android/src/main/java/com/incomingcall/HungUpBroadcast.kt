@@ -9,7 +9,7 @@ class HungUpBroadcast : BroadcastReceiver() {
   override fun onReceive(context: Context?, intent: Intent?) {
 
     if (CallingActivity.active) {
-      context?.sendBroadcast(Intent(Constants.ACTION_END_INCOMING_CALL))
+      context?.sendBroadcast(Intent(Constants.ACTION_END_CALL))
     }
 
     val stopIntent = Intent(context, CallService::class.java)

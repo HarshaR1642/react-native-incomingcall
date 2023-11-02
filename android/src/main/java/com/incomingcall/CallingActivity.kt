@@ -1,5 +1,6 @@
 package com.incomingcall
 
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,7 +14,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.ReactActivity
-
 
 class CallingActivity : ReactActivity() {
 
@@ -31,6 +31,7 @@ class CallingActivity : ReactActivity() {
     super.onDestroy()
   }
 
+  @SuppressLint("UnspecifiedRegisterReceiverFlag")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val bundle = intent.extras
@@ -65,8 +66,12 @@ class CallingActivity : ReactActivity() {
       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 
     val mIntentFilter = IntentFilter();
-    mIntentFilter.addAction(Constants.ACTION_END_INCOMING_CALL);
-    registerReceiver(mBroadcastReceiver, mIntentFilter)
+    mIntentFilter.addAction(Constants.ACTION_END_CALL);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      registerReceiver(mBroadcastReceiver, mIntentFilter, Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      registerReceiver(mBroadcastReceiver, mIntentFilter)
+    }
 
     acceptButton.setOnClickListener {
       stopService(Intent(this, CallService::class.java))
@@ -87,7 +92,7 @@ class CallingActivity : ReactActivity() {
 
   private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
-      if (intent.action == Constants.ACTION_END_INCOMING_CALL) {
+      if (intent.action == Constants.ACTION_END_CALL) {
         finishAndRemoveTask()
       }
     }

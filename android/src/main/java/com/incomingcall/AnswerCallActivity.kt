@@ -1,5 +1,6 @@
 package com.incomingcall
 
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.app.PictureInPictureParams
@@ -20,7 +21,6 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.WritableMap
 
-
 class AnswerCallActivity : ReactActivity() {
 
   override fun onStart() {
@@ -33,6 +33,7 @@ class AnswerCallActivity : ReactActivity() {
     active = false
   }
 
+  @SuppressLint("UnspecifiedRegisterReceiverFlag")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
 
@@ -56,12 +57,16 @@ class AnswerCallActivity : ReactActivity() {
 
 
     if (CallingActivity.active) {
-      sendBroadcast(Intent(Constants.ACTION_END_INCOMING_CALL))
+      sendBroadcast(Intent(Constants.ACTION_END_CALL))
     }
 
     val mIntentFilter = IntentFilter();
-    mIntentFilter.addAction(Constants.ACTION_END_ACTIVE_CALL);
-    registerReceiver(mBroadcastReceiver, mIntentFilter)
+    mIntentFilter.addAction(Constants.ACTION_END_CALL);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      registerReceiver(mBroadcastReceiver, mIntentFilter, Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      registerReceiver(mBroadcastReceiver, mIntentFilter)
+    }
 
     stopService(Intent(this, CallService::class.java))
     val notificationManager =
@@ -84,29 +89,31 @@ class AnswerCallActivity : ReactActivity() {
 
   private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
-      if (intent.action == Constants.ACTION_END_ACTIVE_CALL) {
+      if (intent.action == Constants.ACTION_END_CALL) {
         finishAndRemoveTask()
       }
     }
   }
 
+  @Deprecated("Deprecated in Java")
   override fun onBackPressed() {
     // super.onBackPressed()
-    enterPipMode(380, 214)
+    enterPipMode()
   }
 
   override fun onUserLeaveHint() {
-    enterPipMode(380, 214)
     super.onUserLeaveHint()
+    enterPipMode()
   }
 
   override fun onWindowFocusChanged(hasFocus: Boolean) {
-    if (!hasFocus) {
-      enterPipMode(380, 214)
-    }
     super.onWindowFocusChanged(hasFocus)
+    if (!hasFocus) {
+      enterPipMode()
+    }
   }
 
+  @SuppressLint("VisibleForTests")
   @RequiresApi(Build.VERSION_CODES.O)
   override fun onPictureInPictureModeChanged(
     isInPictureInPictureMode: Boolean,
@@ -124,19 +131,18 @@ class AnswerCallActivity : ReactActivity() {
     }
   }
 
-  private fun enterPipMode(width: Int, height: Int) {
+  private fun enterPipMode() {
     if (this.isFinishing || this.isDestroyed || !active) {
       return
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val ratWidth = if (width > 0) width else 380
-      val ratHeight = if (height > 0) height else 214
+      val ratWidth = 380
+      val ratHeight = 214
       val ratio = Rational(ratWidth, ratHeight)
-      var pip_Builder: PictureInPictureParams.Builder? = null
-      pip_Builder = PictureInPictureParams.Builder()
-      pip_Builder.setAspectRatio(ratio).build()
-      this.enterPictureInPictureMode(pip_Builder.build())
+      val pipBuilder = PictureInPictureParams.Builder()
+      pipBuilder.setAspectRatio(ratio).build()
+      this.enterPictureInPictureMode(pipBuilder.build())
     }
   }
 

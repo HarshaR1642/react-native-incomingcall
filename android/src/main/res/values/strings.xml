@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">Incoming Call</string>
+  <string name="app_name">Incoming Call</string>
+  <string name="avatar_image">avatarImage</string>
+  <string name="visitor">Visitor</string>
+  <string name="incoming_video_call">Incoming Video Call</string>
+  <string name="decline">Decline</string>
+  <string name="accept">Accept</string>
+  <string name="visitor_image">visitorImage</string>
+  <string name="answer">Answer</string>
 </resources>
