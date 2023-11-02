@@ -67,6 +67,16 @@ android {
 }
 
 repositories {
+  exclusiveContent {
+    filter {
+      includeGroup "com.facebook.react"
+    }
+    forRepository {
+      maven {
+        url "$rootDir/../node_modules/react-native/android"
+      }
+    }
+  }
   mavenCentral()
   google()
 }
@@ -74,7 +84,9 @@ repositories {
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
-  implementation "com.facebook.react:react-android:0.72.6"//noinspection GradleDependency
+  //noinspection GradleDynamicVersion
+  implementation "com.facebook.react:react-native:0.67.5"
+  //noinspection GradleDependency
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation 'com.airbnb.android:lottie:6.1.0'
 }
