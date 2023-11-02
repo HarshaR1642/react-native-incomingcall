@@ -74,7 +74,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
     val intent = Intent(reactApplicationContext, CallService::class.java)
     intent.putExtra("channelName", options?.getString("channelName"))
     intent.putExtra("channelId", options?.getString("channelId"))
-    intent.putExtra("timeout", options?.getString("timeout"))
+    intent.putExtra("timeout", options?.getDouble("timeout")?.toLong() ?: Constants.TIME_OUT)
     intent.putExtra("component", options?.getString("component"))
     intent.putExtra("callerName", options?.getString("callerName"))
     intent.putExtra("accessToken", options?.getString("accessToken"))
