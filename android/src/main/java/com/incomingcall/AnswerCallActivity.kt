@@ -106,13 +106,6 @@ class AnswerCallActivity : ReactActivity() {
     enterPipMode()
   }
 
-  override fun onWindowFocusChanged(hasFocus: Boolean) {
-    super.onWindowFocusChanged(hasFocus)
-    if (!hasFocus) {
-      enterPipMode()
-    }
-  }
-
   @SuppressLint("VisibleForTests")
   @RequiresApi(Build.VERSION_CODES.O)
   override fun onPictureInPictureModeChanged(
