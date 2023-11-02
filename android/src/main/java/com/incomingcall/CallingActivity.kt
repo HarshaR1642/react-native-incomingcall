@@ -9,7 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.ReactActivity
@@ -18,8 +18,8 @@ import com.facebook.react.ReactActivity
 class CallingActivity : ReactActivity() {
 
   private lateinit var name: TextView
-  private lateinit var acceptButton: Button
-  private lateinit var declineButton: Button
+  private lateinit var acceptButton: LinearLayout
+  private lateinit var declineButton: LinearLayout
 
   override fun onStart() {
     super.onStart()
