@@ -71,16 +71,14 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
         CallService::class.java
       )
     )
-    val channelName = options?.getString("channelName")
-    val channelId = options?.getString("channelId")
-    val timeout = options?.getDouble("timeout")?.toLong()
-    val component = options?.getString("component")
-    val callerName = options?.getString("callerName")
-    val accessToken = options?.getString("accessToken")
-    val callData = CallData(channelName, channelId, timeout, component, callerName, accessToken)
-
     val intent = Intent(reactApplicationContext, CallService::class.java)
-    intent.putExtra("callData", callData)
+    intent.putExtra("channelName", options?.getString("channelName"))
+    intent.putExtra("channelId", options?.getString("channelId"))
+    intent.putExtra("timeout", options?.getString("timeout"))
+    intent.putExtra("component", options?.getString("component"))
+    intent.putExtra("callerName", options?.getString("callerName"))
+    intent.putExtra("accessToken", options?.getString("accessToken"))
+
     reactApplicationContext.startForegroundService(intent)
   }
 

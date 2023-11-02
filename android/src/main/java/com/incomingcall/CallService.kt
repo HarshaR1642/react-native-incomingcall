@@ -10,6 +10,7 @@ import android.content.Intent
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -39,11 +40,10 @@ class CallService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
     val bundle = intent?.extras
-    val callData = bundle?.getParcelable<CallData>("callData")
 
-    val timeout = callData?.timeout ?: Constants.TIME_OUT
+    val timeout = bundle?.getLong("timeout") ?: Constants.TIME_OUT
 
-    val notification: Notification = buildNotification(callData)
+    val notification: Notification = buildNotification(bundle)
     startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
     playRingtone()
     startVibration()
@@ -52,20 +52,28 @@ class CallService : Service() {
     return START_NOT_STICKY
   }
 
-  private fun buildNotification(callData: CallData?): Notification {
+  private fun buildNotification(bundle: Bundle?): Notification {
+
+    val channelName = bundle?.getString("channelName") ?: Constants.INCOMING_CALL
+    val channelId = bundle?.getString("channelId") ?: Constants.INCOMING_CALL
+    val component = bundle?.getString("component")
+    val callerName = bundle?.getString("callerName") ?: "Visitor"
+    val accessToken = bundle?.getString("accessToken")
 
     val customView = RemoteViews(packageName, R.layout.call_notification)
 
-    if (callData?.callerName != null) {
-      customView.setTextViewText(R.id.name, callData.callerName)
-    }
+    customView.setTextViewText(R.id.name, callerName)
 
     val notificationIntent = Intent(this, CallingActivity::class.java)
     val hungUpIntent = Intent(this, HungUpBroadcast::class.java)
     val answerIntent = Intent(this, AnswerCallActivity::class.java)
 
-    notificationIntent.putExtra("callData", callData)
-    answerIntent.putExtra("callData", callData)
+    notificationIntent.putExtra("component", component)
+    notificationIntent.putExtra("callerName", callerName)
+    notificationIntent.putExtra("accessToken", accessToken)
+
+    answerIntent.putExtra("component", component)
+    answerIntent.putExtra("accessToken", accessToken)
 
     val flag = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flag)
@@ -79,15 +87,16 @@ class CallService : Service() {
       val notificationManager =
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
       val notificationChannel = NotificationChannel(
-        callData?.channelId,
-        callData?.channelName, NotificationManager.IMPORTANCE_HIGH
+        channelId,
+        channelName,
+        NotificationManager.IMPORTANCE_HIGH
       )
       notificationChannel.setSound(null, null)
       notificationChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
 
       notificationManager.createNotificationChannel(notificationChannel)
     }
-    val notification = NotificationCompat.Builder(this, callData?.channelId ?: "")
+    val notification = NotificationCompat.Builder(this, channelId)
     notification.setContentTitle(Constants.INCOMING_CALL)
     notification.setTicker(Constants.INCOMING_CALL)
     notification.setContentText(Constants.INCOMING_CALL)

@@ -68,14 +68,12 @@ class AnswerCallActivity : ReactActivity() {
       getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.cancel(1000)
     setContentView(R.layout.call_accept)
-    val callData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      intent.getParcelableExtra("callData", CallData::class.java)
-    } else {
-      intent?.getParcelableExtra("callData")
-    }
+
+    val bundle = intent.extras
+    val component = bundle?.getString("component")
 
     val reactNativeFragment = ReactFragment.Builder()
-      .setComponentName(callData?.component)
+      .setComponentName(component)
       .setLaunchOptions(intent.extras)
       .build()
     supportFragmentManager

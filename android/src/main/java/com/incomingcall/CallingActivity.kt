@@ -34,7 +34,7 @@ class CallingActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val bundle = intent.extras
-    val callData = bundle?.getParcelable<CallData>("callData")
+    val callerName = bundle?.getString("callerName") ?: "Visitor"
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
@@ -59,10 +59,7 @@ class CallingActivity : ReactActivity() {
     name = findViewById(R.id.name)
     acceptButton = findViewById(R.id.acceptButton)
     declineButton = findViewById(R.id.declineButton)
-
-    if (callData?.callerName != null) {
-      name.text = callData.callerName
-    }
+    name.text = callerName
 
     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -74,7 +71,10 @@ class CallingActivity : ReactActivity() {
     acceptButton.setOnClickListener {
       stopService(Intent(this, CallService::class.java))
       val answerIntent = Intent(this, AnswerCallActivity::class.java)
-      answerIntent.putExtra("callData", callData)
+      val component = bundle?.getString("component")
+      val accessToken = bundle?.getString("accessToken")
+      answerIntent.putExtra("component", component)
+      answerIntent.putExtra("accessToken", accessToken)
       startActivity(answerIntent)
       finishAndRemoveTask()
     }
