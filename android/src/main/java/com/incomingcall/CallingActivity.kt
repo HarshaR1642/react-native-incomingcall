@@ -21,6 +21,7 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import kotlinx.android.synthetic.main.call_fullscreen.*
+import java.util.jar.Manifest
 
 
 class CallingActivity : ReactActivity() {
@@ -39,11 +40,6 @@ class CallingActivity : ReactActivity() {
     super.onCreate(savedInstanceState)
     val bundle = intent.extras
 
-    if (allPermissionsGranted()) {
-      startCamera()
-    } else {
-      ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-    }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
@@ -108,37 +104,6 @@ class CallingActivity : ReactActivity() {
     }
   }
 
-  private fun startCamera() {
-    val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
-    cameraProviderFuture.addListener(Runnable {
-
-      val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-      val preview = Preview.Builder()
-        .build()
-        .also {
-          it.setSurfaceProvider(viewFinder.surfaceProvider)
-        }
-
-      val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
-      try {
-        // Unbind use cases before rebinding
-        cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
-          this, cameraSelector, preview
-        )
-      } catch (exc: Exception) {
-      }
-
-    }, ContextCompat.getMainExecutor(this))
-  }
-
-  private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-    ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
-  }
-
   private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
       if (intent.action == Constants.ACTION_END_INCOMING_CALL) {
@@ -150,7 +115,5 @@ class CallingActivity : ReactActivity() {
   companion object {
     var active = false
     private const val TAG_KEYGUARD = "Incoming:unLock"
-    private const val REQUEST_CODE_PERMISSIONS = 20
-    private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
   }
 }
