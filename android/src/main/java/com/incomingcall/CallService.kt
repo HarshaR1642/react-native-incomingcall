@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
@@ -97,6 +98,7 @@ class CallService : Service() {
     notification.setStyle(NotificationCompat.DecoratedCustomViewStyle())
     notification.setCustomContentView(customView)
     notification.setCustomBigContentView(customView)
+    notification.color = 0XF9F9FC
 
     return notification.build()
   }
