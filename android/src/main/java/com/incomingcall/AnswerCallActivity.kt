@@ -3,23 +3,16 @@ package com.incomingcall
 import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.app.NotificationManager
-import android.app.PictureInPictureParams
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.util.Rational
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactFragment
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.WritableMap
 
 class AnswerCallActivity : ReactActivity() {
 
@@ -92,62 +85,8 @@ class AnswerCallActivity : ReactActivity() {
     }
   }
 
-  @Deprecated("Deprecated in Java")
-  override fun onBackPressed() {
-    // super.onBackPressed()
-    enterPipMode()
-  }
-
-  override fun onUserLeaveHint() {
-    super.onUserLeaveHint()
-    enterPipMode()
-  }
-
-  @SuppressLint("VisibleForTests")
-  @RequiresApi(Build.VERSION_CODES.O)
-  override fun onPictureInPictureModeChanged(
-    isInPictureInPictureMode: Boolean,
-    newConfig: Configuration
-  ) {
-    super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-    val map: WritableMap = Arguments.createMap()
-    map.putString("pip_mode", isInPictureInPictureMode.toString())
-    IncomingCallModule(reactInstanceManager.currentReactContext as ReactApplicationContext).sendEventToJs(
-      "pip_mode",
-      map
-    )
-  }
-
-  private fun enterPipMode() {
-    if (this.isFinishing || this.isDestroyed || !active) {
-      return
-    }
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val ratWidth = 380
-      val ratHeight = 214
-      val ratio = Rational(ratWidth, ratHeight)
-      val pipBuilder = PictureInPictureParams.Builder()
-      pipBuilder
-        .setAspectRatio(ratio)
-        .build()
-      this.enterPictureInPictureMode(pipBuilder.build())
-    }
-  }
-
-  override fun onStop() {
-    super.onStop()
-    onPipExit = true
-  }
-
-  override fun onResume() {
-    super.onResume()
-    onPipExit = false
-  }
-
   companion object {
-    var onPipExit = false
     var active = false
-    private const val TAG_KEYGUARD = "Incoming:unLock"
+    private const val TAG_KEYGUARD = "Incoming:Intercom"
   }
 }
