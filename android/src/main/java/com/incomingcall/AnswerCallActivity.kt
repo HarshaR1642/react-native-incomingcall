@@ -74,11 +74,8 @@ class AnswerCallActivity : ReactActivity() {
     notificationManager.cancel(1000)
     setContentView(R.layout.call_accept)
 
-    val bundle = intent.extras
-    val component = bundle?.getString("component")
-
     val reactNativeFragment = ReactFragment.Builder()
-      .setComponentName(component)
+      .setComponentName(Constants.CHANNEL)
       .setLaunchOptions(intent.extras)
       .build()
     supportFragmentManager
@@ -119,9 +116,6 @@ class AnswerCallActivity : ReactActivity() {
       "pip_mode",
       map
     )
-    if (onPipExit) {
-      finishAndRemoveTask()
-    }
   }
 
   private fun enterPipMode() {
@@ -134,7 +128,9 @@ class AnswerCallActivity : ReactActivity() {
       val ratHeight = 214
       val ratio = Rational(ratWidth, ratHeight)
       val pipBuilder = PictureInPictureParams.Builder()
-      pipBuilder.setAspectRatio(ratio).build()
+      pipBuilder
+        .setAspectRatio(ratio)
+        .build()
       this.enterPictureInPictureMode(pipBuilder.build())
     }
   }

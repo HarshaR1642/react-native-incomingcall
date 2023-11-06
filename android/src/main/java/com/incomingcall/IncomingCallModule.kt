@@ -1,8 +1,12 @@
 package com.incomingcall
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationManagerCompat
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -27,11 +31,6 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
       )
     )
     val intent = Intent(reactApplicationContext, CallService::class.java)
-    intent.putExtra("channelName", options?.getString("channelName"))
-    intent.putExtra("channelId", options?.getString("channelId"))
-    intent.putExtra("timeout", options?.getDouble("timeout")?.toLong() ?: Constants.TIME_OUT)
-    intent.putExtra("component", options?.getString("component"))
-    intent.putExtra("callerName", options?.getString("callerName"))
     intent.putExtra("accessToken", options?.getString("accessToken"))
 
     reactApplicationContext.startForegroundService(intent)
@@ -50,6 +49,22 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
       reactApplicationContext.sendBroadcast(Intent(Constants.ACTION_END_CALL))
     }
   }
+
+  @ReactMethod
+  fun areNotificationsEnabled(promise: Promise) {
+    if (NotificationManagerCompat.from(reactApplicationContext).areNotificationsEnabled()) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val notificationManager =
+          reactApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channel = notificationManager.getNotificationChannel(Constants.CHANNEL)
+        promise.resolve(channel?.importance != NotificationManager.IMPORTANCE_NONE)
+      } else {
+        promise.resolve(true)
+      }
+    }
+    promise.resolve(false)
+  }
+
 
   @ReactMethod
   fun sendEventToJs(eventName: String, params: WritableMap?) {

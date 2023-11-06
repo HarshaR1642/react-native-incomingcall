@@ -2,19 +2,17 @@ import { NativeModules } from 'react-native';
 
 const IncomingCall = NativeModules.IncomingCall;
 
-const showIncomingCall = (options: {
-  channelName: string;
-  channelId: string;
-  timeout: number;
-  component: string;
-  callerName: string;
-  accessToken: string;
-}): any => {
+const showIncomingCall = (options: { accessToken: string }): void => {
   IncomingCall.showIncomingCall(options);
 };
 
-const endCall = (): any => {
+const endCall = (): void => {
   IncomingCall.endCall();
 };
 
-export { showIncomingCall, endCall };
+const areNotificationsEnabled = async () => {
+  const granted = await IncomingCall.areNotificationsEnabled();
+  return granted;
+};
+
+export { showIncomingCall, endCall, areNotificationsEnabled };

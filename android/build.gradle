@@ -88,5 +88,4 @@ dependencies {
   implementation "com.facebook.react:react-native:0.67.5"
   //noinspection GradleDependency
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.airbnb.android:lottie:6.1.0'
 }
