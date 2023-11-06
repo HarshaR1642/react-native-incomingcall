@@ -11,13 +11,11 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageButton
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.ReactActivity
 
 class CallingActivity : ReactActivity() {
 
-  private lateinit var name: TextView
   private lateinit var acceptButton: ImageButton
   private lateinit var declineButton: ImageButton
 
@@ -35,7 +33,6 @@ class CallingActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val bundle = intent.extras
-    val callerName = bundle?.getString("callerName") ?: "Visitor"
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
@@ -57,10 +54,8 @@ class CallingActivity : ReactActivity() {
 
     setContentView(R.layout.call_fullscreen)
 
-    name = findViewById(R.id.name)
     acceptButton = findViewById(R.id.acceptButton)
     declineButton = findViewById(R.id.declineButton)
-    name.text = callerName
 
     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -76,9 +71,7 @@ class CallingActivity : ReactActivity() {
     acceptButton.setOnClickListener {
       stopService(Intent(this, CallService::class.java))
       val answerIntent = Intent(this, AnswerCallActivity::class.java)
-      val component = bundle?.getString("component")
       val accessToken = bundle?.getString("accessToken")
-      answerIntent.putExtra("component", component)
       answerIntent.putExtra("accessToken", accessToken)
       startActivity(answerIntent)
       finishAndRemoveTask()

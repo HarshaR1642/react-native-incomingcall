@@ -32,38 +32,26 @@ class CallService : Service() {
 
     val bundle = intent?.extras
 
-    val timeout = bundle?.getLong("timeout") ?: Constants.TIME_OUT
-
     val notification: Notification = buildNotification(bundle)
     startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
     playRingtone()
     startVibration()
-    startTimer(timeout)
+    startTimer(Constants.TIME_OUT)
 
     return START_NOT_STICKY
   }
 
   private fun buildNotification(bundle: Bundle?): Notification {
 
-    val channelName = bundle?.getString("channelName") ?: Constants.INCOMING_CALL
-    val channelId = bundle?.getString("channelId") ?: Constants.INCOMING_CALL
-    val component = bundle?.getString("component")
-    val callerName = bundle?.getString("callerName") ?: "Visitor"
     val accessToken = bundle?.getString("accessToken")
 
     val customView = RemoteViews(packageName, R.layout.call_notification)
-
-    customView.setTextViewText(R.id.name, callerName)
 
     val notificationIntent = Intent(this, CallingActivity::class.java)
     val hungUpIntent = Intent(this, HungUpBroadcast::class.java)
     val answerIntent = Intent(this, AnswerCallActivity::class.java)
 
-    notificationIntent.putExtra("component", component)
-    notificationIntent.putExtra("callerName", callerName)
     notificationIntent.putExtra("accessToken", accessToken)
-
-    answerIntent.putExtra("component", component)
     answerIntent.putExtra("accessToken", accessToken)
 
     val flag = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -78,8 +66,8 @@ class CallService : Service() {
       val notificationManager =
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
       val notificationChannel = NotificationChannel(
-        channelId,
-        channelName,
+        Constants.CHANNEL,
+        Constants.CHANNEL,
         NotificationManager.IMPORTANCE_HIGH
       )
       notificationChannel.setSound(null, null)
@@ -87,7 +75,7 @@ class CallService : Service() {
 
       notificationManager.createNotificationChannel(notificationChannel)
     }
-    val notification = NotificationCompat.Builder(this, channelId)
+    val notification = NotificationCompat.Builder(this, Constants.CHANNEL)
     notification.setContentTitle(Constants.INCOMING_CALL)
     notification.setTicker(Constants.INCOMING_CALL)
     notification.setContentText(Constants.INCOMING_CALL)
