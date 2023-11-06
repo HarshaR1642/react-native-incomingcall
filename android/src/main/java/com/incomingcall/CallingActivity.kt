@@ -71,8 +71,6 @@ class CallingActivity : ReactActivity() {
     acceptButton.setOnClickListener {
       stopService(Intent(this, CallService::class.java))
       val answerIntent = Intent(this, AnswerCallActivity::class.java)
-      val accessToken = bundle?.getString("accessToken")
-      answerIntent.putExtra("accessToken", accessToken)
       startActivity(answerIntent)
       finishAndRemoveTask()
     }
@@ -93,6 +91,6 @@ class CallingActivity : ReactActivity() {
 
   companion object {
     var active = false
-    private const val TAG_KEYGUARD = "Incoming:unLock"
+    private const val TAG_KEYGUARD = "Incoming:CallActivity"
   }
 }

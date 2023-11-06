@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
@@ -43,16 +42,11 @@ class CallService : Service() {
 
   private fun buildNotification(bundle: Bundle?): Notification {
 
-    val accessToken = bundle?.getString("accessToken")
-
     val customView = RemoteViews(packageName, R.layout.call_notification)
 
     val notificationIntent = Intent(this, CallingActivity::class.java)
     val hungUpIntent = Intent(this, HungUpBroadcast::class.java)
     val answerIntent = Intent(this, AnswerCallActivity::class.java)
-
-    notificationIntent.putExtra("accessToken", accessToken)
-    answerIntent.putExtra("accessToken", accessToken)
 
     val flag = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flag)

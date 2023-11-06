@@ -2,7 +2,7 @@ import { NativeModules } from 'react-native';
 
 const IncomingCall = NativeModules.IncomingCall;
 
-const showIncomingCall = (options: { accessToken: string }): void => {
+const showIncomingCall = (options = {}): void => {
   IncomingCall.showIncomingCall(options);
 };
 

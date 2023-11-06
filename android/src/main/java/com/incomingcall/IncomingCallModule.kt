@@ -31,7 +31,6 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
       )
     )
     val intent = Intent(reactApplicationContext, CallService::class.java)
-    intent.putExtra("accessToken", options?.getString("accessToken"))
 
     reactApplicationContext.startForegroundService(intent)
   }
