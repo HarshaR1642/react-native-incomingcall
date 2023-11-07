@@ -1,13 +1,17 @@
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 const IncomingCall = NativeModules.IncomingCall;
 
 const showIncomingCall = (options = {}): void => {
-  IncomingCall.showIncomingCall(options);
+  if (Platform.OS === 'android') {
+    IncomingCall.showIncomingCall(options);
+  }
 };
 
 const endCall = (): void => {
-  IncomingCall.endCall();
+  if (Platform.OS === 'android') {
+    IncomingCall.endCall();
+  }
 };
 
 const areNotificationsEnabled = async () => {
