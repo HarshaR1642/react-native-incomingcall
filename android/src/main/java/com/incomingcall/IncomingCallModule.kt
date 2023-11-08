@@ -24,6 +24,9 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
   @RequiresApi(Build.VERSION_CODES.O)
   @ReactMethod
   fun showIncomingCall(options: ReadableMap?) {
+    if(AnswerCallActivity.active){
+      return
+    }
     reactApplicationContext.stopService(
       Intent(
         reactApplicationContext,

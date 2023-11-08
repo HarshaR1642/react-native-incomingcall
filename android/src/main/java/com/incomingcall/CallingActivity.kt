@@ -32,7 +32,7 @@ class CallingActivity : ReactActivity() {
   @SuppressLint("UnspecifiedRegisterReceiverFlag")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val bundle = intent.extras
+    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
