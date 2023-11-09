@@ -1,11 +1,11 @@
 <resources>
   <string name="app_name">Incoming Call</string>
   <string name="avatar_image">avatarImage</string>
-  <string name="incoming_call">Incoming Call</string>
+  <string name="incoming_call">Intercom Call</string>
   <string name="decline">Decline</string>
   <string name="accept">Accept</string>
   <string name="visitor_image">visitorImage</string>
   <string name="answer">Answer</string>
-  <string name="smart_home_video">Smart Home Video...</string>
+  <string name="smart_home_video">Smart Home Video…</string>
   <string name="smart_home">Smart Home</string>
 </resources>
