@@ -1,29 +1,23 @@
 package com.incomingcall
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.facebook.react.ReactActivity
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.WritableMap
-import kotlinx.android.synthetic.main.call_fullscreen.*
-
 
 class CallingActivity : ReactActivity() {
+
+  private lateinit var acceptButton: ImageButton
+  private lateinit var declineButton: ImageButton
 
   override fun onStart() {
     super.onStart()
@@ -35,15 +29,10 @@ class CallingActivity : ReactActivity() {
     super.onDestroy()
   }
 
+  @SuppressLint("UnspecifiedRegisterReceiverFlag")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val bundle = intent.extras
-
-    if (allPermissionsGranted()) {
-      startCamera()
-    } else {
-      ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-    }
+    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
@@ -64,25 +53,24 @@ class CallingActivity : ReactActivity() {
     )
 
     setContentView(R.layout.call_fullscreen)
-    val callerName = bundle?.getString("callerName")
-    if(callerName != null){
-      name.text = callerName
-    }
+
+    acceptButton = findViewById(R.id.acceptButton)
+    declineButton = findViewById(R.id.declineButton)
 
     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 
     val mIntentFilter = IntentFilter();
-    mIntentFilter.addAction(Constants.ACTION_END_INCOMING_CALL);
-    registerReceiver(mBroadcastReceiver, mIntentFilter)
+    mIntentFilter.addAction(Constants.ACTION_END_CALL);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      registerReceiver(mBroadcastReceiver, mIntentFilter, Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      registerReceiver(mBroadcastReceiver, mIntentFilter)
+    }
 
     acceptButton.setOnClickListener {
       stopService(Intent(this, CallService::class.java))
       val answerIntent = Intent(this, AnswerCallActivity::class.java)
-      val component = bundle?.getString("component")
-      val accessToken = bundle?.getString("accessToken")
-      answerIntent.putExtra("component", component)
-      answerIntent.putExtra("accessToken", accessToken)
       startActivity(answerIntent)
       finishAndRemoveTask()
     }
@@ -93,55 +81,9 @@ class CallingActivity : ReactActivity() {
     }
   }
 
-  override fun onRequestPermissionsResult(
-    requestCode: Int, permissions: Array<String>, grantResults:
-    IntArray
-  ) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    if (requestCode == REQUEST_CODE_PERMISSIONS) {
-      // If all permissions granted , then start Camera
-      if (allPermissionsGranted()) {
-        startCamera()
-      } else {
-        // finishAndRemoveTask()
-      }
-    }
-  }
-
-  private fun startCamera() {
-    val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
-    cameraProviderFuture.addListener(Runnable {
-
-      val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-      val preview = Preview.Builder()
-        .build()
-        .also {
-          it.setSurfaceProvider(viewFinder.surfaceProvider)
-        }
-
-      val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
-      try {
-        // Unbind use cases before rebinding
-        cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
-          this, cameraSelector, preview
-        )
-      } catch (exc: Exception) {
-      }
-
-    }, ContextCompat.getMainExecutor(this))
-  }
-
-  private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-    ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
-  }
-
   private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
-      if (intent.action == Constants.ACTION_END_INCOMING_CALL) {
+      if (intent.action == Constants.ACTION_END_CALL) {
         finishAndRemoveTask()
       }
     }
@@ -149,8 +91,6 @@ class CallingActivity : ReactActivity() {
 
   companion object {
     var active = false
-    private const val TAG_KEYGUARD = "Incoming:unLock"
-    private const val REQUEST_CODE_PERMISSIONS = 20
-    private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+    private const val TAG_KEYGUARD = "Incoming:CallActivity"
   }
 }
