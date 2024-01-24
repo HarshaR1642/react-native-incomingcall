@@ -29,6 +29,7 @@ class AnswerCallActivity : ReactActivity() {
   @SuppressLint("UnspecifiedRegisterReceiverFlag")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
+    IncomingCallModule.sendIntercomBroadcast(this, "Call Answered")
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)

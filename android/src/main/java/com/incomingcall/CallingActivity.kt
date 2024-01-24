@@ -79,6 +79,8 @@ class CallingActivity : ReactActivity() {
       stopService(Intent(this, CallService::class.java))
       finishAndRemoveTask()
     }
+
+    IncomingCallModule.sendIntercomBroadcast(this, "Inside calling activity")
   }
 
   private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {

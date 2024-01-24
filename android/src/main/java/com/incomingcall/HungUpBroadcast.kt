@@ -8,6 +8,8 @@ class HungUpBroadcast : BroadcastReceiver() {
 
   override fun onReceive(context: Context?, intent: Intent?) {
 
+    IncomingCallModule.sendIntercomBroadcast(context!!, "Call Ended")
+
     if (CallingActivity.active) {
       context?.sendBroadcast(Intent(Constants.ACTION_END_CALL))
     }

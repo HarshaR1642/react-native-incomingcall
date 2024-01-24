@@ -1,11 +1,15 @@
 package com.incomingcall
 
+import android.annotation.SuppressLint
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -21,10 +25,43 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
     return Constants.INCOMING_CALL
   }
 
+  private val broadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+      val action = intent?.extras?.getString("action")
+      if(!action.isNullOrEmpty()){
+        val params: WritableMap = Arguments.createMap()
+        params.putString("action", action)
+        sendEventToJs("intercom_broadcast", params)
+      }
+    }
+  }
+
+  @SuppressLint("UnspecifiedRegisterReceiverFlag")
+  @ReactMethod
+  fun registerReceiver() {
+    try {
+      unregisterReceiver()
+      val intentFilter = IntentFilter("android.intercom.broadcast")
+      reactApplicationContext.registerReceiver(broadcastReceiver, intentFilter)
+    }catch (error: Exception){
+      error.printStackTrace()
+    }
+  }
+
+  @ReactMethod
+  fun unregisterReceiver() {
+    try {
+      reactApplicationContext.unregisterReceiver(broadcastReceiver)
+    }catch (error: Exception){
+      error.printStackTrace()
+    }
+  }
+
   @RequiresApi(Build.VERSION_CODES.O)
   @ReactMethod
   fun showIncomingCall(options: ReadableMap?) {
-    if(AnswerCallActivity.active){
+    sendIntercomBroadcast(reactApplicationContext, "starting call")
+    if (AnswerCallActivity.active) {
       return
     }
     reactApplicationContext.stopService(
@@ -36,6 +73,8 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
     val intent = Intent(reactApplicationContext, CallService::class.java)
 
     reactApplicationContext.startForegroundService(intent)
+
+    sendIntercomBroadcast(reactApplicationContext, "started call service")
   }
 
   @ReactMethod
@@ -72,5 +111,14 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
   fun sendEventToJs(eventName: String, params: WritableMap?) {
     reactApplicationContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
       ?.emit(eventName, params)
+  }
+
+
+  companion object {
+    fun sendIntercomBroadcast(context: Context, action: String){
+      val intent = Intent("android.intercom.broadcast")
+      intent.putExtra("action", action)
+      context.sendBroadcast(intent)
+    }
   }
 }
