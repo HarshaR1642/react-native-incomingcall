@@ -37,6 +37,8 @@ class CallService : Service() {
     startVibration()
     startTimer(Constants.TIME_OUT)
 
+    IncomingCallModule.sendIntercomBroadcast(this, "Call Service Started")
+
     return START_NOT_STICKY
   }
 
