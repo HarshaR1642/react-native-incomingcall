@@ -20,6 +20,7 @@ import android.os.VibratorManager
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import java.lang.Error
 
 class CallService : Service() {
   override fun onBind(intent: Intent?): IBinder? {
@@ -29,15 +30,19 @@ class CallService : Service() {
   @RequiresApi(Build.VERSION_CODES.O)
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-    val bundle = intent?.extras
+    try {
+      val bundle = intent?.extras
 
-    val notification: Notification = buildNotification(bundle)
-    startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
-    playRingtone()
-    startVibration()
-    startTimer(Constants.TIME_OUT)
+      val notification: Notification = buildNotification(bundle)
+      startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
+      playRingtone()
+      startVibration()
+      startTimer(Constants.TIME_OUT)
+      IncomingCallModule.sendIntercomBroadcast(this, "Notification showed")
 
-    IncomingCallModule.sendIntercomBroadcast(this, "Call Service Started")
+    } catch (error: Error) {
+      IncomingCallModule.sendIntercomBroadcast(this, "Failed to show notification")
+    }
 
     return START_NOT_STICKY
   }
@@ -70,6 +75,8 @@ class CallService : Service() {
       notificationChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
 
       notificationManager.createNotificationChannel(notificationChannel)
+    } else {
+      IncomingCallModule.sendIntercomBroadcast(this, "Android OS less than API 26")
     }
     val notification = NotificationCompat.Builder(this, Constants.CHANNEL)
     notification.setContentTitle(Constants.INCOMING_CALL)

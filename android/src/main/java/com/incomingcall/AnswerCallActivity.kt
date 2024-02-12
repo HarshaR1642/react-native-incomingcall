@@ -29,7 +29,6 @@ class AnswerCallActivity : ReactActivity() {
   @SuppressLint("UnspecifiedRegisterReceiverFlag")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
-    IncomingCallModule.sendIntercomBroadcast(this, "Call answered")
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
@@ -49,6 +48,7 @@ class AnswerCallActivity : ReactActivity() {
         or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
     )
 
+    IncomingCallModule.sendIntercomBroadcast(this, "Call screen shown")
 
     if (CallingActivity.active) {
       sendBroadcast(Intent(Constants.ACTION_END_CALL))
