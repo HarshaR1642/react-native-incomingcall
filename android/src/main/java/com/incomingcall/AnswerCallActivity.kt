@@ -48,7 +48,7 @@ class AnswerCallActivity : ReactActivity() {
         or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
     )
 
-    IncomingCallModule.sendIntercomBroadcast(this, "Call screen shown")
+    IncomingCallModule.sendIntercomBroadcast(this, "Call Answered")
 
     if (CallingActivity.active) {
       sendBroadcast(Intent(Constants.ACTION_END_CALL))
@@ -81,6 +81,9 @@ class AnswerCallActivity : ReactActivity() {
   private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
       if (intent.action == Constants.ACTION_END_CALL) {
+        context?.let {
+          IncomingCallModule.sendIntercomBroadcast(it, "Call Hangup")
+        }
         finishAndRemoveTask()
       }
     }
