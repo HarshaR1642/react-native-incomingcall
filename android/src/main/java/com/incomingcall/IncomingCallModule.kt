@@ -60,7 +60,6 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
   @RequiresApi(Build.VERSION_CODES.O)
   @ReactMethod
   fun showIncomingCall(options: ReadableMap?) {
-    sendIntercomBroadcast(reactApplicationContext, "starting call")
     if (AnswerCallActivity.active) {
       return
     }
@@ -74,7 +73,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
 
     reactApplicationContext.startForegroundService(intent)
 
-    sendIntercomBroadcast(reactApplicationContext, "started call service")
+    sendIntercomBroadcast(reactApplicationContext, "Invoked call notification")
   }
 
   @ReactMethod
