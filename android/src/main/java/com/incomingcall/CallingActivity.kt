@@ -68,8 +68,11 @@ class CallingActivity : ReactActivity() {
       registerReceiver(mBroadcastReceiver, mIntentFilter)
     }
 
+    IncomingCallModule.sendIntercomBroadcast(this, "Incoming call full screen showed")
+
     acceptButton.setOnClickListener {
       stopService(Intent(this, CallService::class.java))
+      IncomingCallModule.sendIntercomBroadcast(this, "Accept button clicked from full screen")
       val answerIntent = Intent(this, AnswerCallActivity::class.java)
       startActivity(answerIntent)
       finishAndRemoveTask()
@@ -77,10 +80,10 @@ class CallingActivity : ReactActivity() {
 
     declineButton.setOnClickListener {
       stopService(Intent(this, CallService::class.java))
+      IncomingCallModule.sendIntercomBroadcast(this, "Decline button clicked from full screen")
       finishAndRemoveTask()
     }
 
-    IncomingCallModule.sendIntercomBroadcast(this, "Inside calling activity")
   }
 
   private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
