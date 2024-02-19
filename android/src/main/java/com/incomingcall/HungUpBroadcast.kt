@@ -14,5 +14,8 @@ class HungUpBroadcast : BroadcastReceiver() {
 
     val stopIntent = Intent(context, CallService::class.java)
     context?.stopService(stopIntent)
+
+    IncomingCallModule.sendIntercomBroadcast(context!!, "Call Declined")
+
   }
 }

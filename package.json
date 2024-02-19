@@ -1,6 +1,6 @@
 {
   "name": "@harsha1642/react-native-incomingcall",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "description": "test",
   "main": "src/index",
   "module": "lib/module/index",
