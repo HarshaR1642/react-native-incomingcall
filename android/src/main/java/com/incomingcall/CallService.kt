@@ -78,6 +78,7 @@ class CallService : Service() {
     } else {
       IncomingCallModule.sendIntercomBroadcast(this, "Android OS less than API 26")
     }
+
     val notification = NotificationCompat.Builder(this, Constants.CHANNEL)
     notification.setContentTitle(Constants.INCOMING_CALL)
     notification.setTicker(Constants.INCOMING_CALL)
@@ -89,6 +90,7 @@ class CallService : Service() {
     notification.setStyle(NotificationCompat.DecoratedCustomViewStyle())
     notification.setCustomContentView(customView)
     notification.setCustomBigContentView(customView)
+    notification.setPriority(NotificationCompat.PRIORITY_HIGH) // Set notification priority to high to show in power saving mode
     notification.color = 0XF9F9FC
 
     return notification.build()
