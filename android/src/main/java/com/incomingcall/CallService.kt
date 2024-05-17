@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
@@ -23,6 +24,9 @@ import androidx.core.app.NotificationCompat
 import java.lang.Error
 
 class CallService : Service() {
+
+  private var wakeLock: PowerManager.WakeLock? = null
+
   override fun onBind(intent: Intent?): IBinder? {
     return null
   }
@@ -32,6 +36,14 @@ class CallService : Service() {
 
     try {
       val bundle = intent?.extras
+
+      // Acquire a wake lock
+      val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+      wakeLock = powerManager.newWakeLock(
+        PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+        "MyApp:WakeLockTag"
+      )
+      wakeLock?.acquire()
 
       val notification: Notification = buildNotification(bundle)
       startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
@@ -158,6 +170,7 @@ class CallService : Service() {
     stopRingtone()
     stopVibration()
     cancelTimer()
+    wakeLock?.release()
   }
 
   companion object {
