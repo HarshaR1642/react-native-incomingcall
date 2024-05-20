@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
@@ -23,6 +24,8 @@ import androidx.core.app.NotificationCompat
 import java.lang.Error
 
 class CallService : Service() {
+  private var volumeButtonReceiver: VolumeButtonReceiver? = null
+
   override fun onBind(intent: Intent?): IBinder? {
     return null
   }
@@ -39,6 +42,12 @@ class CallService : Service() {
       startVibration()
       startTimer(Constants.TIME_OUT)
       IncomingCallModule.sendIntercomBroadcast(this, "Notification showed")
+
+      // Register volume button receiver
+      volumeButtonReceiver = VolumeButtonReceiver()
+      val filter = IntentFilter()
+      filter.addAction("android.media.VOLUME_CHANGED_ACTION")
+      registerReceiver(volumeButtonReceiver, filter)
 
     } catch (error: Error) {
       IncomingCallModule.sendIntercomBroadcast(this, "Failed to show notification")
