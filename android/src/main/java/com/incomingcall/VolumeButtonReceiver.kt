@@ -10,6 +10,7 @@ class VolumeButtonReceiver : BroadcastReceiver() {
     if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
       // Mute the ringtone when volume button is pressed
       CallService.ringtone?.stop()
+      CallService.vibrator?.cancel()
       Log.d("VolumeButtonReceiver", "Volume button pressed, ringtone stopped")
     }
   }
