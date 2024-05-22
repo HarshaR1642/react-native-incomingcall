@@ -47,6 +47,7 @@ class CallService : Service() {
       volumeButtonReceiver = VolumeButtonReceiver()
       val filter = IntentFilter()
       filter.addAction("android.media.VOLUME_CHANGED_ACTION")
+      filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY
       registerReceiver(volumeButtonReceiver, filter)
 
     } catch (error: Error) {
