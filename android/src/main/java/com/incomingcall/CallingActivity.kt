@@ -32,7 +32,7 @@ class CallingActivity : ReactActivity() {
   @SuppressLint("UnspecifiedRegisterReceiverFlag")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
@@ -60,8 +60,8 @@ class CallingActivity : ReactActivity() {
     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 
-    val mIntentFilter = IntentFilter();
-    mIntentFilter.addAction(Constants.ACTION_END_CALL);
+    val mIntentFilter = IntentFilter()
+    mIntentFilter.addAction(Constants.ACTION_END_CALL)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       registerReceiver(mBroadcastReceiver, mIntentFilter, Context.RECEIVER_NOT_EXPORTED)
     } else {

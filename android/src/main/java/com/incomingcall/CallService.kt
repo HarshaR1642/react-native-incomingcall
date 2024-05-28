@@ -21,7 +21,6 @@ import android.os.VibratorManager
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import java.lang.Error
 
 class CallService : Service() {
   private var volumeButtonReceiver: VolumeButtonReceiver? = null
@@ -168,6 +167,7 @@ class CallService : Service() {
     // Unregister volume button receiver
     if (volumeButtonReceiver != null) {
       unregisterReceiver(volumeButtonReceiver)
+      volumeButtonReceiver = null
     }
     stopRingtone()
     stopVibration()
