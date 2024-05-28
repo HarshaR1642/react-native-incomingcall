@@ -28,7 +28,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
   private val broadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
       val action = intent?.extras?.getString("action")
-      if(!action.isNullOrEmpty()){
+      if (!action.isNullOrEmpty()) {
         val params: WritableMap = Arguments.createMap()
         params.putString("action", action)
         sendEventToJs("intercom_broadcast", params)
@@ -43,7 +43,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
       unregisterReceiver()
       val intentFilter = IntentFilter("android.intercom.broadcast")
       reactApplicationContext.registerReceiver(broadcastReceiver, intentFilter)
-    }catch (error: Exception){
+    } catch (error: Exception) {
       error.printStackTrace()
     }
   }
@@ -52,7 +52,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
   fun unregisterReceiver() {
     try {
       reactApplicationContext.unregisterReceiver(broadcastReceiver)
-    }catch (error: Exception){
+    } catch (error: Exception) {
       error.printStackTrace()
     }
   }
@@ -114,7 +114,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
 
 
   companion object {
-    fun sendIntercomBroadcast(context: Context, action: String){
+    fun sendIntercomBroadcast(context: Context, action: String) {
       val intent = Intent("android.intercom.broadcast")
       intent.putExtra("action", action)
       context.sendBroadcast(intent)
