@@ -57,7 +57,7 @@ class AnswerCallActivity : ReactActivity() {
     val mIntentFilter = IntentFilter();
     mIntentFilter.addAction(Constants.ACTION_END_CALL);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      registerReceiver(mBroadcastReceiver, mIntentFilter, Context.RECEIVER_NOT_EXPORTED)
+      registerReceiver(mBroadcastReceiver, mIntentFilter, Context.RECEIVER_EXPORTED)
     } else {
       registerReceiver(mBroadcastReceiver, mIntentFilter)
     }
