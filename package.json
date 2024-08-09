@@ -1,12 +1,12 @@
 {
-  "name": "@harsha1642/react-native-incomingcall",
+  "name": "react-native-incomingcall",
   "version": "2.0.0",
-  "description": "test",
-  "main": "src/index",
-  "module": "lib/module/index",
+  "description": "incoming call",
+  "private": true,
+  "source": "./src/index.tsx",
   "types": "src/types/index.d.ts",
-  "react-native": "src/index",
-  "source": "src/index",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/module/index.js",
   "files": [
     "src",
     "lib",
@@ -22,9 +22,12 @@
     "!**/.*"
   ],
   "scripts": {
+    "example": "yarn workspace react-native-incomingcall-example",
     "test": "jest",
-    "typescript": "tsc --noEmit",
+    "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "prepare": "bob build",
     "release": "release-it"
   },
   "keywords": [
@@ -33,45 +36,51 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Harsha1642/react-native-incomingcall.git"
+    "url": "git+https://github.com/HarshaR1642/react-native-incomingcall.git"
   },
-  "author": "Harsha1642 <harshahari1642@gmail.com> (https://github.com/Harsha1642)",
+  "author": "HarshaR1642 <sriharsha@rently.com> (https://github.com/HarshaR1642)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Harsha1642/react-native-incomingcall/issues"
+    "url": "https://github.com/HarshaR1642/react-native-incomingcall/issues"
   },
-  "homepage": "https://github.com/Harsha1642/react-native-incomingcall#readme",
+  "homepage": "https://github.com/HarshaR1642/react-native-incomingcall#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@react-native-community/eslint-config": "^3.2.0",
-    "@release-it/conventional-changelog": "^8.0.1",
-    "@types/jest": "^29.5.12",
-    "@types/react": "^18.3.3",
-    "@types/react-native": "^0.73.0",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@react-native/eslint-config": "^0.73.1",
+    "@release-it/conventional-changelog": "^5.0.0",
+    "@types/jest": "^29.5.5",
+    "@types/react": "^18.2.44",
     "del-cli": "^5.1.0",
-    "eslint": "^9.8.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
+    "eslint": "^8.51.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "jest": "^29.7.0",
-    "pod-install": "^0.2.2",
-    "prettier": "^3.3.3",
-    "react": "^18.3.1",
-    "react-native": "^0.74.5",
-    "release-it": "^17.6.0",
-    "typescript": "^5.5.4"
+    "prettier": "^3.0.3",
+    "react": "18.2.0",
+    "react-native": "0.74.5",
+    "react-native-builder-bob": "^0.29.0",
+    "release-it": "^15.0.0",
+    "turbo": "^1.10.7",
+    "typescript": "^5.2.2"
   },
   "resolutions": {
-    "@types/react": "17.0.21"
+    "@types/react": "^18.2.44"
   },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
   },
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "yarn@3.6.1",
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
     ]
   },
@@ -95,10 +104,11 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "@react-native-community",
+      "@react-native",
       "prettier"
     ],
     "rules": {
+      "react/react-in-jsx-scope": "off",
       "prettier/prettier": [
         "error",
         {
@@ -121,5 +131,35 @@
     "tabWidth": 2,
     "trailingComma": "es5",
     "useTabs": false
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "commonjs",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json",
+          "esm": true
+        }
+      ]
+    ]
+  },
+  "create-react-native-library": {
+    "type": "module-legacy",
+    "languages": "kotlin-swift",
+    "version": "0.40.0"
   }
 }

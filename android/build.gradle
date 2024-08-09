@@ -8,10 +8,15 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:8.0.2"
+    classpath "com.android.tools.build:gradle:8.3.2"
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
+}
+
+def reactNativeArchitectures() {
+  def value = rootProject.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
 def isNewArchitectureEnabled() {
@@ -33,12 +38,23 @@ def getExtOrIntegerDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Incomingcall_" + name]).toInteger()
 }
 
-android {
-  namespace "com.incomingcall"
+def supportsNamespace() {
+  def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+  def major = parsed[0].toInteger()
+  def minor = parsed[1].toInteger()
 
-  sourceSets {
-    main {
-      manifest.srcFile "src/main/AndroidManifestNew.xml"
+  // Namespace support was added in 7.3.0
+  return (major == 7 && minor >= 3) || major >= 8
+}
+
+android {
+  if (supportsNamespace()) {
+    namespace "com.incomingcall"
+
+    sourceSets {
+      main {
+        manifest.srcFile "src/main/AndroidManifestNew.xml"
+      }
     }
   }
 
@@ -74,8 +90,9 @@ repositories {
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
+  // For < 0.71, this will be from the local maven repo
+  // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
-  //noinspection GradleDependency
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
