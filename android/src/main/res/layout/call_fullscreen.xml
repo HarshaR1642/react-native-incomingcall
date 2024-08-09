@@ -4,99 +4,103 @@
   android:layout_height="fill_parent"
   android:background="@drawable/background"
   android:orientation="vertical">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_marginStart="20dp"
+    android:layout_marginTop="50dp"
+    android:layout_marginEnd="20dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+      android:id="@+id/callType"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="sans-serif"
+      android:gravity="center"
+      android:paddingBottom="10dp"
+      android:text="@string/incoming_call"
+      android:textColor="@color/white"
+      android:textSize="24sp" />
+
+    <TextView
+      android:id="@+id/name"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="sans-serif"
+      android:gravity="center"
+      android:paddingBottom="5dp"
+      android:text="@string/smart_home_video"
+      android:textColor="@color/white"
+      android:textSize="20sp" />
+  </LinearLayout>
+
+  <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_centerHorizontal="true"
+    android:layout_marginBottom="60dp"
+    android:orientation="horizontal">
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center_horizontal">
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="140dp"
+      android:layout_marginBottom="60dp"
+      android:orientation="vertical">
+
+      <ImageButton
+        android:id="@+id/declineButton"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:background="@drawable/decline"
+        android:contentDescription="@string/decline"
+        android:gravity="center"
+        android:orientation="vertical" />
 
       <TextView
-        android:id="@+id/callType"
+        android:id="@+id/tvDecline"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:paddingBottom="10dp"
-        android:text="@string/incoming_call"
+        android:text="@string/decline"
         android:textColor="@color/white"
-        android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/smart_home_video"
-            android:fontFamily="sans-serif"
-            android:paddingBottom="5dp"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+        android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="60dp"
+      android:orientation="vertical">
+
+      <ImageButton
+        android:id="@+id/acceptButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="60dp">
+        android:layout_gravity="center"
+        android:background="@drawable/accept"
+        android:contentDescription="@string/accept"
+        android:gravity="center"
+        android:orientation="vertical" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="60dp"
-            android:layout_marginEnd="140dp">
-
-          <ImageButton
-                android:id="@+id/declineButton"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:background="@drawable/decline"
-                android:contentDescription="@string/decline" />
-            <TextView
-                android:id="@+id/tvDecline"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/white"
-                android:text="@string/decline"
-                android:gravity="center" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="60dp">
-          <ImageButton
-                android:id="@+id/acceptButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:background="@drawable/accept"
-                android:contentDescription="@string/accept" />
-            <TextView
-                android:id="@+id/tvAccept"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/white"
-                android:text="@string/accept"
-                android:gravity="center" />
-        </LinearLayout>
+      <TextView
+        android:id="@+id/tvAccept"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/accept"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
     </LinearLayout>
+  </LinearLayout>
 </RelativeLayout>
