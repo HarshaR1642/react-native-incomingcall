@@ -20,6 +20,7 @@ import android.os.VibratorManager
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 
 class CallService : Service() {
   override fun onBind(intent: Intent?): IBinder? {
@@ -90,7 +91,7 @@ class CallService : Service() {
       .setCustomContentView(customView)
       .setCustomBigContentView(customView)
       .setPriority(NotificationCompat.PRIORITY_HIGH) // Set notification priority to high to show in power saving mode
-      .setColor(0XF9F9FC)
+      .setColor(ContextCompat.getColor(this, R.color.white))
       .setColorized(true)
       .build()
   }
