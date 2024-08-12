@@ -9,4 +9,5 @@
   <string name="smart_home">Smart Home</string>
   <string name="swipe_down_to_decline">Swipe down to decline</string>
   <string name="swipe_up_to_answer">Swipe up to answer</string>
+  <string name="accept">Accept</string>
 </resources>

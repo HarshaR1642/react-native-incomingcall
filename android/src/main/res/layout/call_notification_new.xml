@@ -43,10 +43,12 @@
     <Button
       android:id="@+id/btnDecline"
       style="?android:attr/buttonBarButtonStyle"
-      android:layout_width="100dp"
+      android:layout_width="120dp"
       android:layout_height="35dp"
       android:layout_marginEnd="5dp"
       android:background="@drawable/decline_button_background"
+      android:drawableLeft="@drawable/call_end"
+      android:paddingHorizontal="10dp"
       android:stateListAnimator="@null"
       android:text="@string/decline"
       android:textColor="@color/white" />
@@ -54,10 +56,13 @@
     <Button
       android:id="@+id/btnAnswer"
       style="?android:attr/buttonBarButtonStyle"
-      android:layout_width="100dp"
+      android:layout_width="120dp"
       android:layout_height="35dp"
       android:layout_marginStart="5dp"
       android:background="@drawable/accept_button_background"
+      android:drawableLeft="@drawable/call_accept_white"
+      android:elevation="5dp"
+      android:paddingHorizontal="10dp"
       android:stateListAnimator="@null"
       android:text="@string/answer"
       android:textColor="@color/white" />
