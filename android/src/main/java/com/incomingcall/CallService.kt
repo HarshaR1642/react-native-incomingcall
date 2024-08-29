@@ -20,7 +20,7 @@ import android.os.VibratorManager
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import java.lang.Error
+import androidx.core.content.ContextCompat
 
 class CallService : Service() {
   override fun onBind(intent: Intent?): IBinder? {
@@ -79,21 +79,21 @@ class CallService : Service() {
       IncomingCallModule.sendIntercomBroadcast(this, "Android OS less than API 26")
     }
 
-    val notification = NotificationCompat.Builder(this, Constants.CHANNEL)
-    notification.setContentTitle(Constants.INCOMING_CALL)
-    notification.setTicker(Constants.INCOMING_CALL)
-    notification.setContentText(Constants.INCOMING_CALL)
-    notification.setSmallIcon(R.drawable.incoming_video_call)
-    notification.setCategory(NotificationCompat.CATEGORY_CALL)
-    notification.setOngoing(true)
-    notification.setFullScreenIntent(pendingIntent, true)
-    notification.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-    notification.setCustomContentView(customView)
-    notification.setCustomBigContentView(customView)
-    notification.setPriority(NotificationCompat.PRIORITY_HIGH) // Set notification priority to high to show in power saving mode
-    notification.color = 0XF9F9FC
-
-    return notification.build()
+    return NotificationCompat.Builder(this, Constants.CHANNEL)
+      .setContentTitle(Constants.INCOMING_CALL)
+      .setTicker(Constants.INCOMING_CALL)
+      .setContentText(Constants.INCOMING_CALL)
+      .setSmallIcon(R.drawable.incoming_video_call)
+      .setCategory(NotificationCompat.CATEGORY_CALL)
+      .setOngoing(true)
+      .setFullScreenIntent(pendingIntent, true)
+      .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+      .setCustomContentView(customView)
+      .setCustomBigContentView(customView)
+      .setPriority(NotificationCompat.PRIORITY_HIGH) // Set notification priority to high to show in power saving mode
+      .setColor(ContextCompat.getColor(this, R.color.white))
+      .setColorized(true)
+      .build()
   }
 
   private fun removeNotification() {
