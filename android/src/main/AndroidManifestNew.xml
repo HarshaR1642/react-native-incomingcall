@@ -1,10 +1,39 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-  <uses-permission android:name="android.permission.VIBRATE" />
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
-  <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-  <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application>
+        <service
+            android:name=".CallService"
+            android:foregroundServiceType="phoneCall" />
+
+        <activity
+            android:name=".CallingActivity"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:showOnLockScreen="true">
+            <intent-filter>
+                <action android:name="android.intent.action.END_CALL" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".AnswerCallActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:showOnLockScreen="true"
+            android:taskAffinity=".AnswerCallActivity" />
+
+        <receiver android:name=".HungUpBroadcast" />
+    </application>
 
 </manifest>

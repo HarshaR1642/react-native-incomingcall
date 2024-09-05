@@ -23,147 +23,147 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 
 class CallService : Service() {
-  override fun onBind(intent: Intent?): IBinder? {
-    return null
-  }
-
-  @RequiresApi(Build.VERSION_CODES.O)
-  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
-    try {
-      val bundle = intent?.extras
-
-      val notification: Notification = buildNotification(bundle)
-      startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
-      playRingtone()
-      startVibration()
-      startTimer(Constants.TIME_OUT)
-      IncomingCallModule.sendIntercomBroadcast(this, "Notification showed")
-
-    } catch (error: Error) {
-      IncomingCallModule.sendIntercomBroadcast(this, "Failed to show notification")
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 
-    return START_NOT_STICKY
-  }
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-  private fun buildNotification(bundle: Bundle?): Notification {
+        try {
+            val bundle = intent?.extras
 
-    val customView = RemoteViews(packageName, R.layout.call_notification)
+            val notification: Notification = buildNotification(bundle)
+            startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
+            playRingtone()
+            startVibration()
+            startTimer(Constants.TIME_OUT)
+            IncomingCallModule.sendIntercomBroadcast(this, "Notification showed")
 
-    val notificationIntent = Intent(this, CallingActivity::class.java)
-    val hungUpIntent = Intent(this, HungUpBroadcast::class.java)
-    val answerIntent = Intent(this, AnswerCallActivity::class.java)
-
-    val flag = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flag)
-    val hungUpPendingIntent = PendingIntent.getBroadcast(this, 0, hungUpIntent, flag)
-    val answerPendingIntent = PendingIntent.getActivity(this, 0, answerIntent, flag)
-
-    customView.setOnClickPendingIntent(R.id.btnAnswer, answerPendingIntent)
-    customView.setOnClickPendingIntent(R.id.btnDecline, hungUpPendingIntent)
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val notificationManager =
-        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-      val notificationChannel = NotificationChannel(
-        Constants.CHANNEL,
-        Constants.CHANNEL,
-        NotificationManager.IMPORTANCE_HIGH
-      )
-      notificationChannel.setSound(null, null)
-      notificationChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
-
-      notificationManager.createNotificationChannel(notificationChannel)
-    } else {
-      IncomingCallModule.sendIntercomBroadcast(this, "Android OS less than API 26")
-    }
-
-    return NotificationCompat.Builder(this, Constants.CHANNEL)
-      .setContentTitle(Constants.INCOMING_CALL)
-      .setTicker(Constants.INCOMING_CALL)
-      .setContentText(Constants.INCOMING_CALL)
-      .setSmallIcon(R.drawable.incoming_video_call)
-      .setCategory(NotificationCompat.CATEGORY_CALL)
-      .setOngoing(true)
-      .setFullScreenIntent(pendingIntent, true)
-      .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-      .setCustomContentView(customView)
-      .setCustomBigContentView(customView)
-      .setPriority(NotificationCompat.PRIORITY_HIGH) // Set notification priority to high to show in power saving mode
-      .setColor(ContextCompat.getColor(this, R.color.white))
-      .setColorized(true)
-      .build()
-  }
-
-  private fun removeNotification() {
-    val notificationManager =
-      getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.cancel(Constants.FOREGROUND_SERVICE_ID)
-  }
-
-  private fun startTimer(timeout: Long) {
-    runnable = Runnable {
-      run {
-        stopSelf()
-        if (CallingActivity.active) {
-          sendBroadcast(Intent(Constants.ACTION_END_CALL))
+        } catch (error: Error) {
+            IncomingCallModule.sendIntercomBroadcast(this, "Failed to show notification")
         }
-      }
-    }
-    handler = Handler(Looper.getMainLooper())
-    handler?.postDelayed(runnable!!, timeout)
-  }
 
-  private fun cancelTimer() {
-    handler?.removeCallbacks(runnable!!)
-  }
-
-  private fun playRingtone() {
-    ringtone = RingtoneManager.getRingtone(
-      this,
-      RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-    )
-    ringtone?.play()
-  }
-
-  private fun stopRingtone() {
-    ringtone?.stop()
-  }
-
-  @Suppress("DEPRECATION")
-  @RequiresApi(Build.VERSION_CODES.O)
-  private fun startVibration() {
-    val vibratePattern = longArrayOf(0, 1000, 1000)
-
-    vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-      val vibratorManager =
-        getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-      vibratorManager.defaultVibrator
-    } else {
-      getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        return START_NOT_STICKY
     }
 
-    stopVibration()
-    vibrator?.vibrate(VibrationEffect.createWaveform(vibratePattern, 0))
-  }
+    private fun buildNotification(bundle: Bundle?): Notification {
 
-  private fun stopVibration() {
-    vibrator?.cancel()
-  }
+        val customView = RemoteViews(packageName, R.layout.call_notification)
 
-  override fun onDestroy() {
-    super.onDestroy()
-    removeNotification()
-    stopRingtone()
-    stopVibration()
-    cancelTimer()
-  }
+        val notificationIntent = Intent(this, CallingActivity::class.java)
+        val hungUpIntent = Intent(this, HungUpBroadcast::class.java)
+        val answerIntent = Intent(this, AnswerCallActivity::class.java)
 
-  companion object {
-    var handler: Handler? = null
-    var runnable: Runnable? = null
-    var vibrator: Vibrator? = null
-    var ringtone: Ringtone? = null
-  }
+        val flag = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flag)
+        val hungUpPendingIntent = PendingIntent.getBroadcast(this, 0, hungUpIntent, flag)
+        val answerPendingIntent = PendingIntent.getActivity(this, 0, answerIntent, flag)
+
+        customView.setOnClickPendingIntent(R.id.btnAnswer, answerPendingIntent)
+        customView.setOnClickPendingIntent(R.id.btnDecline, hungUpPendingIntent)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationChannel = NotificationChannel(
+                Constants.CHANNEL,
+                Constants.CHANNEL,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationChannel.setSound(null, null)
+            notificationChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+
+            notificationManager.createNotificationChannel(notificationChannel)
+        } else {
+            IncomingCallModule.sendIntercomBroadcast(this, "Android OS less than API 26")
+        }
+
+        return NotificationCompat.Builder(this, Constants.CHANNEL)
+            .setContentTitle(Constants.INCOMING_CALL)
+            .setTicker(Constants.INCOMING_CALL)
+            .setContentText(Constants.INCOMING_CALL)
+            .setSmallIcon(R.drawable.incoming_video_call)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setOngoing(true)
+            .setFullScreenIntent(pendingIntent, true)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(customView)
+            .setCustomBigContentView(customView)
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // Set notification priority to high to show in power saving mode
+            .setColor(ContextCompat.getColor(this, R.color.white))
+            .setColorized(true)
+            .build()
+    }
+
+    private fun removeNotification() {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(Constants.FOREGROUND_SERVICE_ID)
+    }
+
+    private fun startTimer(timeout: Long) {
+        runnable = Runnable {
+            run {
+                stopSelf()
+                if (CallingActivity.active) {
+                    sendBroadcast(Intent(Constants.ACTION_END_CALL))
+                }
+            }
+        }
+        handler = Handler(Looper.getMainLooper())
+        handler?.postDelayed(runnable!!, timeout)
+    }
+
+    private fun cancelTimer() {
+        handler?.removeCallbacks(runnable!!)
+    }
+
+    private fun playRingtone() {
+        ringtone = RingtoneManager.getRingtone(
+            this,
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        )
+        ringtone?.play()
+    }
+
+    private fun stopRingtone() {
+        ringtone?.stop()
+    }
+
+    @Suppress("DEPRECATION")
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun startVibration() {
+        val vibratePattern = longArrayOf(0, 1000, 1000)
+
+        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager =
+                getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+
+        stopVibration()
+        vibrator?.vibrate(VibrationEffect.createWaveform(vibratePattern, 0))
+    }
+
+    private fun stopVibration() {
+        vibrator?.cancel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        removeNotification()
+        stopRingtone()
+        stopVibration()
+        cancelTimer()
+    }
+
+    companion object {
+        var handler: Handler? = null
+        var runnable: Runnable? = null
+        var vibrator: Vibrator? = null
+        var ringtone: Ringtone? = null
+    }
 }

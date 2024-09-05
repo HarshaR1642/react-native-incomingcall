@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:clipChildren="false"
-  android:clipToPadding="false"
-  android:orientation="vertical">
-
-  <LinearLayout
-    android:id="@+id/linearLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:layout_marginStart="20dp"
-    android:layout_marginTop="50dp"
-    android:layout_marginEnd="20dp"
-    android:gravity="center_horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:orientation="vertical">
 
-    <TextView
-      android:id="@+id/callType"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:gravity="center"
-      android:paddingBottom="10dp"
-      android:text="@string/incoming_call"
-      android:textColor="@color/black"
-      android:textSize="24sp" />
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-    <TextView
-      android:id="@+id/name"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:gravity="center"
-      android:paddingBottom="5dp"
-      android:text="@string/smart_home_video"
-      android:textColor="@color/black"
-      android:textSize="20sp" />
-  </LinearLayout>
+        <TextView
+            android:id="@+id/callType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:text="@string/incoming_call"
+            android:textColor="@color/black"
+            android:textSize="24sp" />
 
-  <LinearLayout
-    android:id="@+id/callIncomingLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="100dp"
-    android:gravity="bottom"
-    android:orientation="vertical">
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="5dp"
+            android:text="@string/smart_home_video"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+    </LinearLayout>
 
-    <TextView
-      android:id="@+id/swipeUpToAnswerText"
-      android:layout_width="match_parent"
-      android:layout_height="50dp"
-      android:layout_marginTop="10dp"
-      android:layout_marginBottom="20dp"
-      android:gravity="center"
-      android:text="@string/swipe_up_to_answer"
-      android:textColor="@color/black"
-      android:textSize="14sp"
-      android:textStyle="italic" />
+    <LinearLayout
+        android:id="@+id/callIncomingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="100dp"
+        android:gravity="bottom"
+        android:orientation="vertical">
 
-    <ImageButton
-      android:id="@+id/callIncoming"
-      android:layout_width="70dp"
-      android:layout_height="70dp"
-      android:layout_gravity="center"
-      android:background="@drawable/icon_background"
-      android:contentDescription="@string/decline"
-      android:elevation="8dp"
-      android:orientation="vertical"
-      android:src="@drawable/call_accept" />
+        <TextView
+            android:id="@+id/swipeUpToAnswerText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="@string/swipe_up_to_answer"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="italic" />
 
-    <TextView
-      android:id="@+id/swipeDownToDeclineText"
-      android:layout_width="match_parent"
-      android:layout_height="50dp"
-      android:layout_marginTop="20dp"
-      android:gravity="center"
-      android:text="@string/swipe_down_to_decline"
-      android:textColor="@color/black"
-      android:textSize="14sp"
-      android:textStyle="italic" />
-  </LinearLayout>
+        <ImageButton
+            android:id="@+id/callIncoming"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:background="@drawable/icon_background"
+            android:contentDescription="@string/decline"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:src="@drawable/call_accept" />
+
+        <TextView
+            android:id="@+id/swipeDownToDeclineText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/swipe_down_to_decline"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+    </LinearLayout>
 
 </RelativeLayout>
