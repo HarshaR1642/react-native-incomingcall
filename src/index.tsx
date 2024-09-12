@@ -1,6 +1,5 @@
-import { NativeModules, Platform } from 'react-native';
-
-const IncomingCall = NativeModules.IncomingCall;
+import { Platform } from 'react-native';
+import IncomingCall from './NativeIncomingCall';
 
 const registerReceiver = (): void => {
   if (Platform.OS === 'android') {
@@ -14,9 +13,9 @@ const unregisterReceiver = (): void => {
   }
 };
 
-const showIncomingCall = (options = {}): void => {
+const showIncomingCall = (): void => {
   if (Platform.OS === 'android') {
-    IncomingCall.showIncomingCall(options);
+    IncomingCall.showIncomingCall();
   }
 };
 
