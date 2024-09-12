@@ -5,8 +5,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
@@ -17,12 +19,16 @@ import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 
 class CallService : Service() {
+
+    private var volumeButtonReceiver: BroadcastReceiver? = null
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -37,6 +43,7 @@ class CallService : Service() {
             startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
             playRingtone()
             startVibration()
+            setVolumeReceiver()
             startTimer(Constants.TIME_OUT)
             IncomingCallModule.sendIntercomBroadcast(this, "Notification showed")
 
@@ -148,6 +155,34 @@ class CallService : Service() {
         vibrator?.vibrate(VibrationEffect.createWaveform(vibratePattern, 0))
     }
 
+    private fun setVolumeReceiver() {
+        volumeButtonReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
+                    // Mute the ringtone when volume button is pressed
+                    stopRingtone()
+                    stopVibration()
+                    Log.d("VolumeButtonReceiver", "Volume button pressed, ringtone stopped")
+                    unregisterReceiver(this)
+                }
+            }
+        }
+
+        val filter = IntentFilter().apply {
+            addAction("android.media.VOLUME_CHANGED_ACTION")
+            priority = IntentFilter.SYSTEM_HIGH_PRIORITY
+        }
+        registerReceiver(volumeButtonReceiver, filter)
+    }
+
+    private fun unregisterVolumeReceiver() {
+        try {
+            unregisterReceiver(volumeButtonReceiver)
+        } catch (e: IllegalArgumentException) {
+            Log.i("unregisterVolumeReceiver", "Already unregistered")
+        }
+    }
+
     private fun stopVibration() {
         vibrator?.cancel()
     }
@@ -155,9 +190,15 @@ class CallService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         removeNotification()
+    // Unregister volume button receiver
+    if (volumeButtonReceiver != null) {
+      unregisterReceiver(volumeButtonReceiver)
+      volumeButtonReceiver = null
+    }
         stopRingtone()
         stopVibration()
         cancelTimer()
+        unregisterVolumeReceiver()
     }
 
     companion object {
