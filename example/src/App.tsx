@@ -38,7 +38,7 @@ export const App = () => {
         style={styles.button}
         title="Show Incoming Call"
         onPress={() => {
-          showIncomingCall({});
+          showIncomingCall();
         }}
       />
     </View>

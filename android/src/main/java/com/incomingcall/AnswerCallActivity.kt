@@ -12,9 +12,16 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.ReactActivity
-import com.facebook.react.ReactFragment
+import com.facebook.react.ReactActivityDelegate
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
+import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class AnswerCallActivity : ReactActivity() {
+
+    override fun getMainComponentName(): String = Constants.CHANNEL
+
+    override fun createReactActivityDelegate(): ReactActivityDelegate =
+        DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
     override fun onStart() {
         super.onStart()
@@ -67,16 +74,6 @@ class AnswerCallActivity : ReactActivity() {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(1000)
-        setContentView(R.layout.call_accept)
-
-        val reactNativeFragment = ReactFragment.Builder()
-            .setComponentName(Constants.CHANNEL)
-            .setLaunchOptions(intent.extras)
-            .build()
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.reactNativeFragment, reactNativeFragment)
-            .commit()
     }
 
     private val mBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {

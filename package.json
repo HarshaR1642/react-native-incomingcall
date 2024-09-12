@@ -68,6 +68,14 @@
     "react": "*",
     "react-native": "*"
   },
+  "codegenConfig": {
+    "name": "IncomingCallSpec",
+    "type": "all",
+    "jsSrcsDir": "./src",
+    "android": {
+      "javaPackageName": "com.incomingcall"
+    }
+  },
   "workspaces": [
     "example"
   ],

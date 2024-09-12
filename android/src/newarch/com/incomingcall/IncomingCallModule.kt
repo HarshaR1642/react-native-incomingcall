@@ -12,18 +12,15 @@ import androidx.core.app.NotificationManagerCompat
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
+import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
+@ReactModule(name = Constants.INCOMING_CALL)
 class IncomingCallModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext) {
+    NativeIncomingCallSpec(reactContext) {
 
-    override fun getName(): String {
-        return Constants.INCOMING_CALL
-    }
+    override fun getName() = Constants.INCOMING_CALL
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -37,8 +34,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    @ReactMethod
-    fun registerReceiver() {
+    override fun registerReceiver() {
         try {
             unregisterReceiver()
             val intentFilter = IntentFilter("android.intercom.broadcast")
@@ -48,8 +44,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
-    fun unregisterReceiver() {
+    override fun unregisterReceiver() {
         try {
             reactApplicationContext.unregisterReceiver(broadcastReceiver)
         } catch (error: Exception) {
@@ -58,8 +53,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    @ReactMethod
-    fun showIncomingCall(options: ReadableMap?) {
+    override fun showIncomingCall() {
         if (AnswerCallActivity.active) {
             return
         }
@@ -76,8 +70,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
         sendIntercomBroadcast(reactApplicationContext, "Invoked call notification")
     }
 
-    @ReactMethod
-    fun endCall() {
+    override fun endCall() {
         reactApplicationContext.stopService(
             Intent(
                 reactApplicationContext,
@@ -90,8 +83,7 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
-    fun areNotificationsEnabled(promise: Promise) {
+    override fun areNotificationsEnabled(promise: Promise) {
         if (NotificationManagerCompat.from(reactApplicationContext).areNotificationsEnabled()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val notificationManager =
@@ -105,13 +97,10 @@ class IncomingCallModule(reactContext: ReactApplicationContext) :
         promise.resolve(false)
     }
 
-
-    @ReactMethod
     fun sendEventToJs(eventName: String, params: WritableMap?) {
         reactApplicationContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
             ?.emit(eventName, params)
     }
-
 
     companion object {
         fun sendIntercomBroadcast(context: Context, action: String) {
