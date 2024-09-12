@@ -19,105 +19,105 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
 class IncomingCallModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+    ReactContextBaseJavaModule(reactContext) {
 
-  override fun getName(): String {
-    return Constants.INCOMING_CALL
-  }
-
-  private val broadcastReceiver = object : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-      val action = intent?.extras?.getString("action")
-      if (!action.isNullOrEmpty()) {
-        val params: WritableMap = Arguments.createMap()
-        params.putString("action", action)
-        sendEventToJs("intercom_broadcast", params)
-      }
+    override fun getName(): String {
+        return Constants.INCOMING_CALL
     }
-  }
 
-  @SuppressLint("UnspecifiedRegisterReceiverFlag")
-  @ReactMethod
-  fun registerReceiver() {
-    try {
-      unregisterReceiver()
-      val intentFilter = IntentFilter("android.intercom.broadcast")
-      reactApplicationContext.registerReceiver(broadcastReceiver, intentFilter)
-    } catch (error: Exception) {
-      error.printStackTrace()
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val action = intent?.extras?.getString("action")
+            if (!action.isNullOrEmpty()) {
+                val params: WritableMap = Arguments.createMap()
+                params.putString("action", action)
+                sendEventToJs("intercom_broadcast", params)
+            }
+        }
     }
-  }
 
-  @ReactMethod
-  fun unregisterReceiver() {
-    try {
-      reactApplicationContext.unregisterReceiver(broadcastReceiver)
-    } catch (error: Exception) {
-      error.printStackTrace()
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    @ReactMethod
+    fun registerReceiver() {
+        try {
+            unregisterReceiver()
+            val intentFilter = IntentFilter("android.intercom.broadcast")
+            reactApplicationContext.registerReceiver(broadcastReceiver, intentFilter)
+        } catch (error: Exception) {
+            error.printStackTrace()
+        }
     }
-  }
 
-  @RequiresApi(Build.VERSION_CODES.O)
-  @ReactMethod
-  fun showIncomingCall(options: ReadableMap?) {
-    if (AnswerCallActivity.active) {
-      return
+    @ReactMethod
+    fun unregisterReceiver() {
+        try {
+            reactApplicationContext.unregisterReceiver(broadcastReceiver)
+        } catch (error: Exception) {
+            error.printStackTrace()
+        }
     }
-    reactApplicationContext.stopService(
-      Intent(
-        reactApplicationContext,
-        CallService::class.java
-      )
-    )
-    val intent = Intent(reactApplicationContext, CallService::class.java)
 
-    reactApplicationContext.startForegroundService(intent)
+    @RequiresApi(Build.VERSION_CODES.O)
+    @ReactMethod
+    fun showIncomingCall(options: ReadableMap?) {
+        if (AnswerCallActivity.active) {
+            return
+        }
+        reactApplicationContext.stopService(
+            Intent(
+                reactApplicationContext,
+                CallService::class.java
+            )
+        )
+        val intent = Intent(reactApplicationContext, CallService::class.java)
 
-    sendIntercomBroadcast(reactApplicationContext, "Invoked call notification")
-  }
+        reactApplicationContext.startForegroundService(intent)
 
-  @ReactMethod
-  fun endCall() {
-    reactApplicationContext.stopService(
-      Intent(
-        reactApplicationContext,
-        CallService::class.java
-      )
-    )
-
-    if (CallingActivity.active || AnswerCallActivity.active) {
-      reactApplicationContext.sendBroadcast(Intent(Constants.ACTION_END_CALL))
+        sendIntercomBroadcast(reactApplicationContext, "Invoked call notification")
     }
-  }
 
-  @ReactMethod
-  fun areNotificationsEnabled(promise: Promise) {
-    if (NotificationManagerCompat.from(reactApplicationContext).areNotificationsEnabled()) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val notificationManager =
-          reactApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = notificationManager.getNotificationChannel(Constants.CHANNEL)
-        promise.resolve(channel?.importance != NotificationManager.IMPORTANCE_NONE)
-      } else {
-        promise.resolve(true)
-      }
+    @ReactMethod
+    fun endCall() {
+        reactApplicationContext.stopService(
+            Intent(
+                reactApplicationContext,
+                CallService::class.java
+            )
+        )
+
+        if (CallingActivity.active || AnswerCallActivity.active) {
+            reactApplicationContext.sendBroadcast(Intent(Constants.ACTION_END_CALL))
+        }
     }
-    promise.resolve(false)
-  }
 
-
-  @ReactMethod
-  fun sendEventToJs(eventName: String, params: WritableMap?) {
-    reactApplicationContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-      ?.emit(eventName, params)
-  }
-
-
-  companion object {
-    fun sendIntercomBroadcast(context: Context, action: String) {
-      val intent = Intent("android.intercom.broadcast")
-      intent.putExtra("action", action)
-      context.sendBroadcast(intent)
+    @ReactMethod
+    fun areNotificationsEnabled(promise: Promise) {
+        if (NotificationManagerCompat.from(reactApplicationContext).areNotificationsEnabled()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val notificationManager =
+                    reactApplicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val channel = notificationManager.getNotificationChannel(Constants.CHANNEL)
+                promise.resolve(channel?.importance != NotificationManager.IMPORTANCE_NONE)
+            } else {
+                promise.resolve(true)
+            }
+        }
+        promise.resolve(false)
     }
-  }
+
+
+    @ReactMethod
+    fun sendEventToJs(eventName: String, params: WritableMap?) {
+        reactApplicationContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            ?.emit(eventName, params)
+    }
+
+
+    companion object {
+        fun sendIntercomBroadcast(context: Context, action: String) {
+            val intent = Intent("android.intercom.broadcast")
+            intent.putExtra("action", action)
+            context.sendBroadcast(intent)
+        }
+    }
 }
