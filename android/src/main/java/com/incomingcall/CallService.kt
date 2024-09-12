@@ -190,6 +190,11 @@ class CallService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         removeNotification()
+    // Unregister volume button receiver
+    if (volumeButtonReceiver != null) {
+      unregisterReceiver(volumeButtonReceiver)
+      volumeButtonReceiver = null
+    }
         stopRingtone()
         stopVibration()
         cancelTimer()
