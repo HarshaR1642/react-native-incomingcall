@@ -241,7 +241,6 @@ class CallService : Service() {
         }
 
         val filter = IntentFilter().apply {
-            addAction(ACTION_SCREEN_ON)
             addAction(ACTION_SCREEN_OFF)
             priority = IntentFilter.SYSTEM_HIGH_PRIORITY
         }
