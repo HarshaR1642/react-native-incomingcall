@@ -199,7 +199,7 @@ class CallService : Service() {
                             mediaButtonEvent?.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
                         }
 
-                    if (ringtone?.isPlaying == true && key?.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+                    if ((ringtone?.isPlaying == true || vibrator?.hasVibrator() == true) && key?.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
                         val intent =
                             Intent(this@CallService, AnswerCallActivity::class.java).apply {
                                 addFlags(FLAG_ACTIVITY_NEW_TASK)
@@ -220,7 +220,7 @@ class CallService : Service() {
                 100
             ) {
                 override fun onAdjustVolume(direction: Int) {
-                    if ((direction == -1 || direction == 1) && ringtone?.isPlaying == true) {
+                    if ((direction == -1 || direction == 1) && (ringtone?.isPlaying == true || vibrator?.hasVibrator() == true)) {
                         stopRingtone()
                         stopVibration()
                     }
@@ -233,7 +233,7 @@ class CallService : Service() {
     private fun setPowerButtonReceiver() {
         powerButtonReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (ringtone?.isPlaying == true) {
+                if (ringtone?.isPlaying == true || vibrator?.hasVibrator() == true) {
                     stopRingtone()
                     stopVibration()
                 }
