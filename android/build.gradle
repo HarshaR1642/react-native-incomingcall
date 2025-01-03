@@ -47,12 +47,6 @@ static def supportsNamespace() {
 android {
     if (supportsNamespace()) {
         namespace "com.incomingcall"
-
-        sourceSets {
-            main {
-                manifest.srcFile "src/main/AndroidManifestNew.xml"
-            }
-        }
     }
 
     compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
@@ -60,7 +54,7 @@ android {
     defaultConfig {
         minSdkVersion getExtOrIntegerDefault("minSdkVersion")
         targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
-
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     }
 
     buildTypes {
@@ -73,9 +67,25 @@ android {
         disable "GradleCompatible"
     }
 
+    sourceSets {
+        main {
+            if (supportsNamespace()) {
+                manifest.srcFile "src/main/AndroidManifestNew.xml"
+            }
+            if (isNewArchitectureEnabled()) {
+                java.srcDirs += ['src/newarch']
+            } else {
+                java.srcDirs += ['src/oldarch']
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        buildConfig true
     }
 }
 
