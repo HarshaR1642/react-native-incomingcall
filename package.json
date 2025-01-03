@@ -1,14 +1,14 @@
 {
   "name": "react-native-incomingcall",
   "version": "2.0.0",
-  "description": "incoming call",
-  "private": true,
+  "description": "A react native module to display an incoming call UI triggered by push notifications. Instead of relying on TelephonyManager, this approach uses push notifications sent from a server to notify the app of an incoming call. Upon receiving the notification, the app launches a custom incoming call screen, mimicking the native call UI.",
   "source": "./src/index.tsx",
-  "types": "src/types/index.d.ts",
-  "main": "./src/index.tsx",
-  "module": "./src/index.tsx",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/module/index.js",
+  "types": "./lib/typescript/commonjs/src/index.d.ts",
   "files": [
     "src",
+    "lib",
     "android",
     "!android/build",
     "!android/gradle",
@@ -21,17 +21,16 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-incomingcall-example",
+    "example": "cd example && yarn android",
     "test": "jest",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "del-cli android/build example/android/build example/android/app/build lib",
-    "prepare": "bob build",
-    "release": "release-it"
+    "prepare": "bob build"
   },
   "keywords": [
     "react-native",
-    "android"
+    "android",
+    "incomingcall"
   ],
   "repository": {
     "type": "git",

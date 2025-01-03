@@ -1,0 +1,1 @@
+{"version":3,"names":["_reactNative","require","IncomingCallTurboModule","TurboModuleRegistry","getEnforcing","_default","exports","default"],"sourceRoot":"../../src","sources":["NativeIncomingCall.tsx"],"mappings":";;;;;;AAAA,IAAAA,YAAA,GAAAC,OAAA;AAUA,MAAMC,uBAAuB,GAC3BC,gCAAmB,CAACC,YAAY,CAAO,cAAc,CAAC;AAAC,IAAAC,QAAA,GAAAC,OAAA,CAAAC,OAAA,GAE1CL,uBAAuB","ignoreList":[]}

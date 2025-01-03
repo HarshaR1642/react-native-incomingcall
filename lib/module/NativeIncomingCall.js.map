@@ -1,0 +1,1 @@
+{"version":3,"names":["TurboModuleRegistry","IncomingCallTurboModule","getEnforcing"],"sourceRoot":"../../src","sources":["NativeIncomingCall.tsx"],"mappings":";;AAAA,SAASA,mBAAmB,QAA0B,cAAc;AAUpE,MAAMC,uBAAuB,GAC3BD,mBAAmB,CAACE,YAAY,CAAO,cAAc,CAAC;AAExD,eAAeD,uBAAuB","ignoreList":[]}
