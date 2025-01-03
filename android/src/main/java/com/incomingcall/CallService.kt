@@ -5,8 +5,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_SCREEN_OFF
+import android.content.Intent.ACTION_SCREEN_ON
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.IntentFilter
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
@@ -17,12 +23,22 @@ import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
+import android.view.KeyEvent
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.media.VolumeProviderCompat
+import androidx.media.session.MediaButtonReceiver
+
 
 class CallService : Service() {
+
+    private lateinit var mediaSession: MediaSessionCompat
+    private var powerButtonReceiver: BroadcastReceiver? = null
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -37,6 +53,8 @@ class CallService : Service() {
             startForeground(Constants.FOREGROUND_SERVICE_ID, notification)
             playRingtone()
             startVibration()
+            setVolumeReceiver()
+            setPowerButtonReceiver()
             startTimer(Constants.TIME_OUT)
             IncomingCallModule.sendIntercomBroadcast(this, "Notification showed")
 
@@ -148,6 +166,87 @@ class CallService : Service() {
         vibrator?.vibrate(VibrationEffect.createWaveform(vibratePattern, 0))
     }
 
+    private fun setVolumeReceiver() {
+        mediaSession = MediaSessionCompat(
+            this,
+            "CallService",
+            ComponentName(this, MediaButtonReceiver::class.java),
+            null
+        )
+
+        mediaSession.apply {
+            setPlaybackState(
+                PlaybackStateCompat.Builder()
+                    .setActions(
+                        PlaybackStateCompat.ACTION_PLAY or PlaybackStateCompat.ACTION_PAUSE
+                    )
+                    .setState(
+                        PlaybackStateCompat.STATE_PLAYING,
+                        0,
+                        0f
+                    )
+                    .build()
+            )
+            setCallback(object : MediaSessionCompat.Callback() {
+                override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
+                    val key: KeyEvent? =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            mediaButtonEvent?.getParcelableExtra(
+                                Intent.EXTRA_KEY_EVENT,
+                                KeyEvent::class.java
+                            )
+                        } else {
+                            mediaButtonEvent?.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
+                        }
+
+                    if ((ringtone?.isPlaying == true || vibrator?.hasVibrator() == true) && key?.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+                        val intent =
+                            Intent(this@CallService, AnswerCallActivity::class.java).apply {
+                                addFlags(FLAG_ACTIVITY_NEW_TASK)
+                            }
+                        startActivity(intent)
+                        IncomingCallModule.sendIntercomBroadcast(
+                            this@CallService,
+                            "Call accepted from Notification"
+                        )
+                        stopSelf()
+                    }
+                    return true
+                }
+            })
+            setPlaybackToRemote(object : VolumeProviderCompat(
+                VOLUME_CONTROL_RELATIVE,
+                100,
+                100
+            ) {
+                override fun onAdjustVolume(direction: Int) {
+                    if ((direction == -1 || direction == 1) && (ringtone?.isPlaying == true || vibrator?.hasVibrator() == true)) {
+                        stopRingtone()
+                        stopVibration()
+                    }
+                }
+            })
+            setActive(true)
+        }
+    }
+
+    private fun setPowerButtonReceiver() {
+        powerButtonReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (ringtone?.isPlaying == true || vibrator?.hasVibrator() == true) {
+                    stopRingtone()
+                    stopVibration()
+                }
+            }
+        }
+
+        val filter = IntentFilter().apply {
+            addAction(ACTION_SCREEN_OFF)
+            priority = IntentFilter.SYSTEM_HIGH_PRIORITY
+        }
+        registerReceiver(powerButtonReceiver, filter)
+    }
+
     private fun stopVibration() {
         vibrator?.cancel()
     }
@@ -155,6 +254,11 @@ class CallService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         removeNotification()
+        if (powerButtonReceiver != null) {
+            unregisterReceiver(powerButtonReceiver)
+            powerButtonReceiver = null
+        }
+        mediaSession.release()
         stopRingtone()
         stopVibration()
         cancelTimer()
